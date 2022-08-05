@@ -1,0 +1,30 @@
+﻿@page "/between-rounds"
+@inject IModalService modal
+
+
+<div class="main">
+    <button>Build Deck</button>
+    <p>Or</p>
+    <button @onclick="@(()=>modal.Show<OpponentEntry>("Enter your opponents name"))">Start Next Round</button>
+</div>
+
+
+@code {
+
+}
+
+<style>
+    .main{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-around;
+        height: 100%;
+    }
+    button{
+        margin-bottom: 20px;
+    }
+    p{
+        margin-bottom: 20px;
+    }
+</style>

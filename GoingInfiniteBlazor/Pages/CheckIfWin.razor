@@ -1,0 +1,19 @@
+﻿<h1>Record as a win for @Name?</h1>
+<div>
+    <button @onclick=RecordWin>Yes</button>
+    <button @onclick=ResetLife>No</button>
+</div>
+@code {
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [Parameter] public string Name { get; set; }
+
+    private void RecordWin()
+    {
+        ModalInstance.CloseAsync(ModalResult.Ok("Record Win"));
+    }
+
+    private void ResetLife()
+    {
+        ModalInstance.CancelAsync();
+    }
+}

@@ -1,0 +1,260 @@
+﻿@page "/life-tracker"
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+<div id="life-tracker">
+    <div class="opponent, button-area">
+        <button @onclick=IncrementOpponentLife class="life-changer"></button>
+        <div class="life-total" id="opponent-life">@opponentLifeTotal</div>
+        <button @onclick=DecrementOpponentLife class="life-changer"></button>
+        <p>@opponent</p>
+    </div>
+    <div class="seperator"></div>
+    <div class="player, button-area">
+        <button @onclick=IncrementPlayerLife class="life-changer"></button>
+        <div class="life-total">@playerLifeTotal</div>
+        <button @onclick=DecrementPLayerLife class="life-changer"></button>
+        <p>@playerName</p>
+    </div>
+</div>
+
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; }
+
+    private int opponentLifeTotal = 20;
+    private int playerLifeTotal = 20;
+    private string playerName = "";
+    private string opponent = "";
+    private DraftTournament tourney;
+    private List<Game> games = new List<Game>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        playerName = await LocalStorage.GetItemAsync<string>("PlayerName");
+        opponent = await LocalStorage.GetItemAsync<string>("Opponent");
+        tourney = await LocalStorage.GetItemAsync<DraftTournament>("Tournament");
+    }
+
+    private void IncrementOpponentLife()
+    {
+        opponentLifeTotal++;
+    }
+    private async void DecrementOpponentLife()
+    {
+        opponentLifeTotal--;
+        if (opponentLifeTotal == 0)
+        {
+            await CheckIfPlayerWin();
+        }
+    }
+    private void IncrementPlayerLife()
+    {
+        playerLifeTotal++;
+    }
+    private async void DecrementPLayerLife()
+    {
+        playerLifeTotal--;
+        if (playerLifeTotal == 0)
+        {
+            await CheckIfOpponentWin();
+        }
+    }
+
+    async Task CheckIfPlayerWin()
+    {
+        var formModal = Modal.Show<CheckIfWin>();
+        var result = await formModal.Result;
+
+        if (result.Cancelled)
+        {
+            opponentLifeTotal++;
+            StateHasChanged();
+            return;
+        }
+
+        await RecordGameResult("Win");
+
+        if (CheckIfMatchOver())
+        {
+            RecordMatchResult(SetMatchOutcome());
+        }
+    }
+
+    async Task CheckIfOpponentWin()
+    {
+        var formModal = Modal.Show<CheckIfWin>();
+        var result = await formModal.Result;
+
+        if (result.Cancelled)
+        {
+            playerLifeTotal++;
+            StateHasChanged();
+            return;
+        }
+
+        await RecordGameResult("Loss");
+
+        if (CheckIfMatchOver())
+        {
+            RecordMatchResult(SetMatchOutcome());
+        }
+    }
+
+    private async Task RecordGameResult(string outcome)
+    {
+        Game currentGame = new Game()
+        {
+            Outcome = outcome
+        };
+
+        HttpResponseMessage response = await Http.PostAsJsonAsync<Game>("https://localhost:7248/Game",currentGame);
+        currentGame = JsonConvert.DeserializeObject<Game>(await response.Content.ReadAsStringAsync());
+
+        games.Add(currentGame);
+
+        playerLifeTotal = 20;
+        opponentLifeTotal = 20;
+        StateHasChanged();
+    }
+
+    private async void RecordMatchResult(string outcome)
+    {
+        Match currentMatch = new Match()
+        {
+            OpponentName = opponent,
+            Outcome = outcome,
+            Games = games
+        };
+
+        HttpResponseMessage response = await Http.PostAsJsonAsync<Match>("https://localhost:7248/Match",currentMatch);
+        currentMatch = JsonConvert.DeserializeObject<Match>(await response.Content.ReadAsStringAsync());
+
+        tourney.Matches.Add(currentMatch);
+        await LocalStorage.SetItemAsync("Tournament", tourney);
+
+        if (tourney.Matches.Count < 4)
+        {
+            NavigationManager.NavigateTo("/between-rounds");
+            return;
+        }
+        NavigationManager.NavigateTo("/end-of-tournament");
+    }
+
+    private bool CheckIfMatchOver()
+    {
+        int winCount = 0;
+        int lossCount = 0;
+
+        foreach(Game game in games)
+        {
+            if (game.Outcome == "Draw")
+            {
+                return true;
+            }
+            if (game.Outcome == "Loss")
+            {
+                lossCount++;
+            }
+            if (game.Outcome == "Win")
+            {
+                winCount++;
+            }
+        }
+
+        return winCount > 1 || lossCount > 1;
+    }
+
+    private string SetMatchOutcome()
+    {
+        int winCount = 0;
+        int lossCount = 0;
+        bool drawnGame = false;
+
+        foreach(Game game in games)
+        {
+            if (game.Outcome == "Draw")
+            {
+                drawnGame = true;
+            }
+            if (game.Outcome == "Loss")
+            {
+                lossCount++;
+            }
+            if (game.Outcome == "Win")
+            {
+                winCount++;
+            }
+        }
+
+        if (drawnGame)
+        {
+            if (winCount == lossCount)
+            {
+                return "Draw";
+            }
+            if (winCount < lossCount)
+            {
+                return "Loss";
+            }
+            return "Win";
+        }
+
+        if (winCount < lossCount)
+        {
+            return "Loss";
+        }
+        return "Win";
+    }
+}
+
+<style>
+    .opponent{
+        transform: rotate(180deg);
+    }
+    #life-tracker{
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        align-items: center;
+    }
+    .seperator{
+        height: 10px;
+        width: 100%;
+        background-color: #000000;	
+    }
+    .life-total{
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 120px;
+        right: 0;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        z-index: 1;
+    }
+    .button-area{
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        height: 100%;
+        width: 100%;
+    }
+    .life-changer{
+        height: 100%;
+        width: 50%;
+        padding: 0px;
+        border: none;
+        z-index: 2;
+        opacity: 0;
+    }
+    #opponent-life{
+        transform: rotate(180deg);
+    }
+</style>

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoingInfiniteBlazor", "GoingInfiniteBlazor\GoingInfiniteBlazor.csproj", "{D04C9600-A106-43D2-B6BC-361C2A06DDA0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GoingInfiniteAPI", "GoingInfiniteAPI\GoingInfiniteAPI.csproj", "{411D06B8-B1B1-427D-BE41-5218C1603D03}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D04C9600-A106-43D2-B6BC-361C2A06DDA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D04C9600-A106-43D2-B6BC-361C2A06DDA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D04C9600-A106-43D2-B6BC-361C2A06DDA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D04C9600-A106-43D2-B6BC-361C2A06DDA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{411D06B8-B1B1-427D-BE41-5218C1603D03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{411D06B8-B1B1-427D-BE41-5218C1603D03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{411D06B8-B1B1-427D-BE41-5218C1603D03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{411D06B8-B1B1-427D-BE41-5218C1603D03}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {36426D59-BE3B-4126-98E0-F53C83B1A0BC}
+	EndGlobalSection
+EndGlobal

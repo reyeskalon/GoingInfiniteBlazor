@@ -1,0 +1,25 @@
+﻿@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<input @bind="opponent" type="text" />
+<button @onclick=StartMatch>Start Match</button>
+
+
+@code {
+
+    private string opponent = "";
+
+    private async void StartMatch()
+    {
+
+        Match newMatch = new Match()
+        {
+            OpponentName = opponent,
+            Games = new List<Game>() 
+        };
+
+        await LocalStorage.SetItemAsync("Opponent", opponent);
+
+        NavigationManager.NavigateTo("/life-tracker");
+    }
+}

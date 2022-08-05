@@ -1,0 +1,56 @@
+﻿@page "/end-of-tournament"
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+@if (TournamentLoaded())
+{
+   <div class="matches">
+   @for (int i = 0; i < tourney.Matches.Count; i++)
+   {
+       <div class="match">
+           <h1>Match @(i + 1)</h1>
+           <h3>@tourney.Matches[i].Outcome</h3>
+           <p>Vs</p>
+           <h3>@tourney.Matches[i].OpponentName</h3>
+       </div>
+   }
+   </div>
+   <button @onclick="GoToDeckBuilder">Build Deck</button>
+   <button @onclick="SaveTournament">Save Tournament</button>
+    @if (saveSuccessful)
+    {
+        <p>Tournament Saved</p>
+    }
+}
+
+
+@code {
+    private DraftTournament tourney = null;
+    private bool saveSuccessful = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tourney = await LocalStorage.GetItemAsync<DraftTournament>("Tournament");
+    }
+
+    private bool TournamentLoaded()
+    {
+        return (tourney != null);
+    }
+
+    private void GoToDeckBuilder()
+    {
+        NavigationManager.NavigateTo("/deck-builder");
+    }
+
+    private async void SaveTournament()
+    {
+        HttpResponseMessage response = await Http.PostAsJsonAsync<DraftTournament>("https://localhost:7248/Tournament", tourney);
+        if (response.IsSuccessStatusCode)
+        {
+            saveSuccessful = true;
+            StateHasChanged();
+        }
+    }
+}

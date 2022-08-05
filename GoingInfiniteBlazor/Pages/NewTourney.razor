@@ -1,0 +1,73 @@
+﻿@page "/new-tourney"
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<PageTitle>New FNM Tourney</PageTitle>
+<div id="tourney-info">
+    <div class="input">
+        <label for="lgs">Store Name</label>
+        <input @bind="lgs" type="text" id="lgs"/>
+    </div>
+    <div class="input">
+        <label for="setCode">Set Code</label>
+        <input @bind="setCode" type="text" id="setCode"/>
+    </div>
+    <button type="submit" @onclick=StartNewTourney>Start New Tourney</button>
+</div>
+
+@code {
+
+    private string lgs = string.Empty;
+    private string setCode = "SNC";
+
+    private async void StartNewTourney()
+    {
+        SetLocalStorage();
+        NavigationManager.NavigateTo("/between-rounds");
+    }
+
+    private async void SetLocalStorage()
+    {
+        string playerID = await LocalStorage.GetItemAsync<string>("PlayerID");
+
+        Deck deck = new Deck();
+
+        DraftTournament newTourney = new DraftTournament()
+        {
+            LGS = lgs,
+            Date = DateTime.Now,
+            PlayerID = playerID,
+            SetCode = setCode,
+            DeckID = deck.ID,
+            Matches = new List<Match>(),
+        };
+
+        await LocalStorage.SetItemAsync("Tournament", newTourney);
+        await LocalStorage.SetItemAsync("Deck", deck);
+    }
+}
+
+<style>
+    #tourney-info{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .input{
+        display: flex;
+        justify-content: space-between;
+        margin: 10px;
+        width: 100%;
+    }
+    .input *{
+        height: 20px;
+        margin: 5px;
+    }
+    button{
+        margin: 10px;
+    }
+    input{
+        
+    }
+</style>

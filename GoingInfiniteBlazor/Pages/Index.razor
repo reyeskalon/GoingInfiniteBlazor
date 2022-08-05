@@ -1,0 +1,33 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<button @onclick=StartNewTourney>Track New Tournament</button>
+
+@if (authState != null)
+{
+    <p>
+        Name: @authState.User.Identity.Name
+    </p>
+}
+
+@code {
+
+    [CascadingParameter]
+    private Task<AuthenticationState> _authState { get; set; }
+
+    private AuthenticationState authState;
+
+    protected override async Task OnInitializedAsync()
+    {
+        authState = await _authState;
+    }
+
+    private async void StartNewTourney()
+    {
+        string playerID = authState.User.Claims.ElementAt(0).Value;
+        await LocalStorage.SetItemAsync("PlayerID", playerID);
+        await LocalStorage.SetItemAsync("PlayerName", authState.User.Identity.Name);
+        NavigationManager.NavigateTo("/new-tourney");
+    }
+}
