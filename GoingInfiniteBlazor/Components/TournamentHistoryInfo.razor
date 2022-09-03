@@ -1,0 +1,69 @@
+﻿<div class="flex-column justify-content-around m-3  p-3 @Color rounded border-black border-2 drop-shadow-md">
+    <div class="@HighlightColor rounded p-2">
+        <div class="flex justify-content-start mb-4">
+            <p class="mr-4 font-bold">@Tourney.Date.ToString("MM/dd/yyyy")</p>
+            <div class="flex justify-content-center w-full"><p class="font-bold">@Tourney.LGS</p></div>
+        </div>
+        <div class="flex justify-content-between">
+            <p class="font-bold">Set @Tourney.SetCode</p>
+            <p class="font-bold">Match Win @matchWinPercent%</p>
+            <p class="font-bold">Match Win @gameWinPercent%</p>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public DraftTournament Tourney { get; set; }
+    [Parameter]
+    public string Color { get; set; }
+    [Parameter]
+    public string HighlightColor { get; set; }
+
+    public string matchWinPercent;
+    public string gameWinPercent;
+
+    protected override void OnParametersSet()
+    {
+        MatchWinPercent();
+        GameWinPercent();
+        StateHasChanged();
+    }
+
+    public void MatchWinPercent()
+    {
+        double totalMatches = Tourney.Matches.Count;
+        double wonMatches = 0;
+
+        foreach(Match match in Tourney.Matches)
+        {
+            if (match.Outcome == "Win")
+            {
+                wonMatches++;
+            }
+        }
+
+        matchWinPercent =  (wonMatches / totalMatches * 100).ToString().Substring(0,2);
+    }
+
+    public void GameWinPercent()
+    {
+        double totalGames = 0;
+        double wonGames = 0;
+
+        foreach(Match match in Tourney.Matches)
+        {
+            foreach(Game game in match.Games)
+            {
+                totalGames++;
+                if(game.Outcome == "Win")
+                {
+                    wonGames++;
+                }
+            }
+        }
+
+        gameWinPercent =  (wonGames/ totalGames * 100).ToString().Substring(0,2);
+    }
+}

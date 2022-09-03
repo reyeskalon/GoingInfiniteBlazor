@@ -1,0 +1,43 @@
+﻿@page "/tournament-history"
+@inject HttpClient Http
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+@if (TournamentsLoaded())
+{
+    @for (int i = 0; i < tournaments.Count; i++)
+    {
+        @if (IsEven(i))
+        {
+            <TournamentHistoryInfo Tourney=tournaments[i] Color="bg-slate-300" HighlightColor="bg-slate-100"/>
+        }
+        @if (!IsEven(i))
+        {
+            <TournamentHistoryInfo Tourney=tournaments[i] Color="bg-slate-400" HighlightColor="bg-slate-100"/>
+        }
+    }
+}
+
+@code {
+    List<DraftTournament> tournaments = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string playerID = await LocalStorage.GetItemAsync<string>(Constants.PLAYER_ID);
+        string uri = Constants.API_BASE_URL + $"Tournament/All/{playerID}";
+        string json = await Http.GetStringAsync(uri);
+
+        tournaments = JsonConvert.DeserializeObject<List<DraftTournament>>(json);
+        StateHasChanged();
+
+    }
+
+    private bool TournamentsLoaded()
+    {
+        return tournaments != null;
+    }
+
+    private bool IsEven(int i)
+    {
+        return (i%2 == 0);
+    }
+}

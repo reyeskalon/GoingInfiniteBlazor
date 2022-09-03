@@ -5,7 +5,7 @@ namespace GoingInfiniteAPI.DAO
 {
     public class TournamentSqlDAO : ITournamentDAO
     {
-        private readonly string connectionString = "Server=DESKTOP-JUOLNMK;Database=going_infinite_blazor;Trusted_Connection=True;";
+        private readonly string connectionString = Constants.Constants.DB_CONNECTION_STR;
         private readonly IMatchDAO matchDAO = new MatchSqlDAO();
 
         public DraftTournament NewTournament(DraftTournament tourney)
@@ -43,7 +43,7 @@ namespace GoingInfiniteAPI.DAO
         public DraftTournament GetTournament(int id)
         {
             DraftTournament tourney = new DraftTournament();
-            List<int> matchIDs = new List<int>();
+            
             List<Match> matches = new List<Match>();
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -63,20 +63,7 @@ namespace GoingInfiniteAPI.DAO
                 reader.Close();
             }
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
-            {
-                conn.Open();
-
-                SqlCommand cmd = new SqlCommand("SELECT * FROM matches_in_tournament WHERE tournament_id = @tournament_id", conn);
-                cmd.Parameters.AddWithValue("@tournament_id", id);
-
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    matchIDs.Add(Convert.ToInt32(reader["match_id"]));
-                }
-            }
+            List<int> matchIDs = GetMatchIDs(tourney);
 
             foreach (int matchID in matchIDs)
             {
@@ -86,6 +73,43 @@ namespace GoingInfiniteAPI.DAO
             tourney.Matches = matches;
 
             return tourney;
+        }
+
+        public List<DraftTournament> GetPlayersTournaments(string playerID)
+        {
+            List<DraftTournament> tournaments = new List<DraftTournament>();
+
+            using (SqlConnection conn = new SqlConnection(Constants.Constants.DB_CONNECTION_STR))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM draft_tournaments WHERE player_id = @player_id", conn);
+                cmd.Parameters.AddWithValue("@player_id", playerID);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    tournaments.Add(CreateTournamentFromReader(reader));
+                }
+
+                reader.Close();
+            }
+
+            foreach (DraftTournament tourney in tournaments)
+            {
+                List<int> matchIDs = GetMatchIDs(tourney);
+
+                List<Match> matches = new List<Match>();
+                foreach (int matchID in matchIDs)
+                {
+                    matches.Add(matchDAO.GetMatch(matchID));
+                }
+
+                tourney.Matches = matches;
+            }
+
+            return tournaments;
         }
 
         private DraftTournament CreateTournamentFromReader(SqlDataReader reader)
@@ -104,6 +128,28 @@ namespace GoingInfiniteAPI.DAO
                 tourney.DeckID = Convert.ToInt32(reader["deck_id"]);
             }
             return tourney;
+        }
+
+        private List<int> GetMatchIDs(DraftTournament tourney)
+        {
+            List<int> matchIDs = new List<int>();
+
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand("SELECT * FROM matches_in_tournament WHERE tournament_id = @tournament_id", conn);
+                cmd.Parameters.AddWithValue("@tournament_id", tourney.ID);
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    matchIDs.Add(Convert.ToInt32(reader["match_id"]));
+                }
+            }
+
+            return matchIDs;
         }
     }
 }

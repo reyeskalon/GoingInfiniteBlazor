@@ -1,11 +1,12 @@
 ﻿using System.Data.SqlClient;
 using GoingInfiniteAPI.Models;
+using GoingInfiniteAPI.Constants;
 
 namespace GoingInfiniteAPI.DAO
 {
     public class MatchSqlDAO : IMatchDAO
     {
-        private readonly string connectionString = "Server=DESKTOP-JUOLNMK;Database=going_infinite_blazor;Trusted_Connection=True;";
+        private readonly string connectionString = Constants.Constants.DB_CONNECTION_STR;
         private readonly IGameDAO gameDAO = new GameSqlDAO();
 
         public Match NewMatch(Match match)

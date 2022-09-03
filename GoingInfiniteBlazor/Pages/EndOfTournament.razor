@@ -16,8 +16,8 @@
        </div>
    }
    </div>
-   <button @onclick="GoToDeckBuilder">Build Deck</button>
-   <button @onclick="SaveTournament">Save Tournament</button>
+   <BlueButton OnClickCallback=GoToDeckBuilder Text="Build Deck"></BlueButton>
+   <BlueButton OnClickCallback=SaveTournament Text="Save Tournament"></BlueButton>
     @if (saveSuccessful)
     {
         <p>Tournament Saved</p>
@@ -31,7 +31,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tourney = await LocalStorage.GetItemAsync<DraftTournament>("Tournament");
+        tourney = await LocalStorage.GetItemAsync<DraftTournament>(Constants.TOURNAMENT);
     }
 
     private bool TournamentLoaded()
@@ -46,7 +46,7 @@
 
     private async void SaveTournament()
     {
-        HttpResponseMessage response = await Http.PostAsJsonAsync<DraftTournament>("https://localhost:7248/Tournament", tourney);
+        HttpResponseMessage response = await Http.PostAsJsonAsync<DraftTournament>(Constants.API_BASE_URL + "Tournament", tourney);
         if (response.IsSuccessStatusCode)
         {
             saveSuccessful = true;

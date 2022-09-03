@@ -1,15 +1,10 @@
 ﻿@page "/"
+@attribute [Authorize]
 @inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
-<button @onclick=StartNewTourney>Track New Tournament</button>
-
-@if (authState != null)
-{
-    <p>
-        Name: @authState.User.Identity.Name
-    </p>
-}
+<NavigationCard Text="Track New Tournament" OnClickCallback=StartNewTourney Image="\Images\Sylvan-Library-Commander-Collection-Green-MtG-Art.jpg" />
+<NavigationCard Text="Tournament History" OnClickCallback=TournamentHistory Image="\Images\Staff-of-the-Mind-Magus.jpg" />
 
 @code {
 
@@ -25,9 +20,24 @@
 
     private async void StartNewTourney()
     {
-        string playerID = authState.User.Claims.ElementAt(0).Value;
-        await LocalStorage.SetItemAsync("PlayerID", playerID);
-        await LocalStorage.SetItemAsync("PlayerName", authState.User.Identity.Name);
+        SetLocalStorage();
         NavigationManager.NavigateTo("/new-tourney");
     }
+
+    private async void TournamentHistory()
+    {
+        SetLocalStorage();
+        NavigationManager.NavigateTo("/tournament-history");
+    }
+
+    private async void SetLocalStorage()
+    {
+        string playerID = authState.User.Claims.ElementAt(0).Value;
+        await LocalStorage.SetItemAsync(Constants.PLAYER_ID, playerID);
+        await LocalStorage.SetItemAsync(Constants.PLAYER_NAME, authState.User.Identity.Name);
+    }
 }
+
+<style>
+
+</style>

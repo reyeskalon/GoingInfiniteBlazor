@@ -1,13 +1,7 @@
-﻿module.exports = {
-    mode: 'jit',
-    purge: [
-        './wwwroot/index.html',
-        '/.**/*.razor',
-    ],
+module.exports = {
+    content: ['./Pages/*.{razor,cshtml}',
+        './Components/*.{razor,cshtml}'],
     theme: {
-        extend: {},
-    },
-    variants: {
         extend: {},
     },
     plugins: [],

@@ -36,5 +36,19 @@ namespace GoingInfiniteAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("All/{playerID}")]
+        public IActionResult GetPlayersTournaments(string playerID)
+        {
+            try
+            {
+                List<DraftTournament> tournaments = tournamentDAO.GetPlayersTournaments(playerID);
+                return Ok(tournaments);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

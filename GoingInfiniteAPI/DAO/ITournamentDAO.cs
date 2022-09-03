@@ -6,5 +6,6 @@ namespace GoingInfiniteAPI.DAO
     {
         public DraftTournament NewTournament(DraftTournament tourney);
         public DraftTournament GetTournament(int id);
+        public List<DraftTournament> GetPlayersTournaments(string playerID);
     }
 }

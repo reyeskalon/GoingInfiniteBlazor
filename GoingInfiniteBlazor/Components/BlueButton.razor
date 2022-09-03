@@ -1,0 +1,8 @@
+﻿<button class="m-2 bg-blue-500 shadow-sm rounded m-2 text-white font-bold p-2" @onclick="OnClickCallback">@Text</button>
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+}

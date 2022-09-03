@@ -4,18 +4,18 @@
 @inject HttpClient Http
 
 <div id="life-tracker">
-    <div class="opponent, button-area">
+    <div class="opponent, button-area bg-gradient-to-t from-blue-500 to-blue-300">
         <button @onclick=IncrementOpponentLife class="life-changer"></button>
         <div class="life-total" id="opponent-life">@opponentLifeTotal</div>
         <button @onclick=DecrementOpponentLife class="life-changer"></button>
-        <p>@opponent</p>
+        <p class="opponent-name">@opponent</p>
     </div>
     <div class="seperator"></div>
-    <div class="player, button-area">
-        <button @onclick=IncrementPlayerLife class="life-changer"></button>
-        <div class="life-total">@playerLifeTotal</div>
+    <div class="player, button-area bg-gradient-to-b from-yellow-500 to-yellow-300">
         <button @onclick=DecrementPLayerLife class="life-changer"></button>
-        <p>@playerName</p>
+        <div class="life-total">@playerLifeTotal</div>
+        <button @onclick=IncrementPlayerLife class="life-changer"></button>
+        <p class="player-name">@playerName</p>
     </div>
 </div>
 
@@ -32,9 +32,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        playerName = await LocalStorage.GetItemAsync<string>("PlayerName");
-        opponent = await LocalStorage.GetItemAsync<string>("Opponent");
-        tourney = await LocalStorage.GetItemAsync<DraftTournament>("Tournament");
+        playerName = await LocalStorage.GetItemAsync<string>(Constants.PLAYER_NAME);
+        opponent = await LocalStorage.GetItemAsync<string>(Constants.OPPONENT_NAME);
+        tourney = await LocalStorage.GetItemAsync<DraftTournament>(Constants.TOURNAMENT);
     }
 
     private void IncrementOpponentLife()
@@ -64,7 +64,7 @@
 
     async Task CheckIfPlayerWin()
     {
-        var formModal = Modal.Show<CheckIfWin>();
+        var formModal = Modal.Show<CheckIfWin>("Record as win for " + playerName);
         var result = await formModal.Result;
 
         if (result.Cancelled)
@@ -84,7 +84,7 @@
 
     async Task CheckIfOpponentWin()
     {
-        var formModal = Modal.Show<CheckIfWin>();
+        var formModal = Modal.Show<CheckIfWin>("Record as win for " + opponent);
         var result = await formModal.Result;
 
         if (result.Cancelled)
@@ -109,7 +109,7 @@
             Outcome = outcome
         };
 
-        HttpResponseMessage response = await Http.PostAsJsonAsync<Game>("https://localhost:7248/Game",currentGame);
+        HttpResponseMessage response = await Http.PostAsJsonAsync<Game>(Constants.API_BASE_URL + "Game",currentGame);
         currentGame = JsonConvert.DeserializeObject<Game>(await response.Content.ReadAsStringAsync());
 
         games.Add(currentGame);
@@ -128,11 +128,11 @@
             Games = games
         };
 
-        HttpResponseMessage response = await Http.PostAsJsonAsync<Match>("https://localhost:7248/Match",currentMatch);
+        HttpResponseMessage response = await Http.PostAsJsonAsync<Match>(Constants.API_BASE_URL + "Match",currentMatch);
         currentMatch = JsonConvert.DeserializeObject<Match>(await response.Content.ReadAsStringAsync());
 
         tourney.Matches.Add(currentMatch);
-        await LocalStorage.SetItemAsync("Tournament", tourney);
+        await LocalStorage.SetItemAsync(Constants.TOURNAMENT, tourney);
 
         if (tourney.Matches.Count < 4)
         {
@@ -221,7 +221,7 @@
         align-items: center;
     }
     .seperator{
-        height: 10px;
+        height: 40px;
         width: 100%;
         background-color: #000000;	
     }
@@ -256,5 +256,24 @@
     }
     #opponent-life{
         transform: rotate(180deg);
+    }
+    .opponent-name {
+        position: absolute;
+        margin: auto;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        bottom: 0%;
+        z-index: 1;
+        color: rgb(255,255,255);
+    }
+    .player-name{
+        position: absolute;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        z-index: 1;
+        transform: rotate(180deg);
+        color: rgb(255,255,255);
     }
 </style>

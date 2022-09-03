@@ -5,7 +5,7 @@ namespace GoingInfiniteAPI.DAO
 {
     public class GameSqlDAO : IGameDAO
     {
-        private readonly string connectionString = "Server=DESKTOP-JUOLNMK;Database=going_infinite_blazor;Trusted_Connection=True;";
+        private readonly string connectionString = Constants.Constants.DB_CONNECTION_STR;
 
         public Game NewGame(Game game)
         {

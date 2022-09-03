@@ -1,0 +1,14 @@
+﻿<div class="shadow-lg position-relative m-4">
+    <img src=@Image />
+    <button @onclick=OnClickCallback class="position-absolute m-10 left-0 right-0 bottom-0 bg-opacity-75 bg-black text-white font-bold">@Text</button>
+</div>
+
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Image { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+}

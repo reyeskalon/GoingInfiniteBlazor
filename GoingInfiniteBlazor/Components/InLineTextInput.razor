@@ -1,0 +1,18 @@
+﻿<div class="m-2 flex">
+    <label class="text-gray-700 text-md font-bold py-2 pr-2 whitespace-nowrap align-self-center basis-1/4">@Text</label>
+    <input class="shadow-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline font-bold basis-3/4" type="text" placeholder=@Text value=@Value @oninput=OnValueChanged/>
+</div>
+@code {
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public string Value { get; set; }
+    [Parameter]  
+    public EventCallback<string> ValueChanged { get; set; }
+
+    private Task OnValueChanged(ChangeEventArgs e)  
+    {  
+        Value = e.Value.ToString();  
+        return ValueChanged.InvokeAsync(Value);  
+    }
+}

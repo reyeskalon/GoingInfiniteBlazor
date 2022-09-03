@@ -1,34 +1,29 @@
 ﻿@page "/new-tourney"
-@inject NavigationManager NavigationManager
 @inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
 
 <PageTitle>New FNM Tourney</PageTitle>
-<div id="tourney-info">
-    <div class="input">
-        <label for="lgs">Store Name</label>
-        <input @bind="lgs" type="text" id="lgs"/>
-    </div>
-    <div class="input">
-        <label for="setCode">Set Code</label>
-        <input @bind="setCode" type="text" id="setCode"/>
-    </div>
-    <button type="submit" @onclick=StartNewTourney>Start New Tourney</button>
-</div>
+<form id="tourney-info" class="shadow-md flex-column">
+    <InLineTextInput Text="Store Name" @bind-Value="lgs"></InLineTextInput>
+    <InLineTextInput Text="Set Code" @bind-Value="setCode"></InLineTextInput>
+    <BlueButton OnClickCallback=StartNewTourney Text="Start New Tourney"></BlueButton>
+</form>
 
 @code {
 
     private string lgs = string.Empty;
     private string setCode = "SNC";
+    private string setCode2 = "WWW";
 
     private async void StartNewTourney()
     {
         SetLocalStorage();
-        NavigationManager.NavigateTo("/between-rounds");
+        NavigationManager.NavigateTo("/between-rounds", true);
     }
 
     private async void SetLocalStorage()
     {
-        string playerID = await LocalStorage.GetItemAsync<string>("PlayerID");
+        string playerID = await LocalStorage.GetItemAsync<string>(Constants.PLAYER_ID);
 
         Deck deck = new Deck();
 
@@ -42,32 +37,7 @@
             Matches = new List<Match>(),
         };
 
-        await LocalStorage.SetItemAsync("Tournament", newTourney);
-        await LocalStorage.SetItemAsync("Deck", deck);
+        await LocalStorage.SetItemAsync(Constants.TOURNAMENT, newTourney);
+        await LocalStorage.SetItemAsync(Constants.DECK, deck);
     }
 }
-
-<style>
-    #tourney-info{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-    .input{
-        display: flex;
-        justify-content: space-between;
-        margin: 10px;
-        width: 100%;
-    }
-    .input *{
-        height: 20px;
-        margin: 5px;
-    }
-    button{
-        margin: 10px;
-    }
-    input{
-        
-    }
-</style>

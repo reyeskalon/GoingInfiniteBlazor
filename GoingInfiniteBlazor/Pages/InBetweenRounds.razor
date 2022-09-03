@@ -2,29 +2,32 @@
 @inject IModalService modal
 
 
-<div class="main">
-    <button>Build Deck</button>
-    <p>Or</p>
-    <button @onclick="@(()=>modal.Show<OpponentEntry>("Enter your opponents name"))">Start Next Round</button>
+<div class="flex-column justify-content-around h-100">
+    <BlueButton Text="Build Deck"></BlueButton>
+    <p class="m-2">Or</p>
+    <BlueButton OnClickCallback=ShowModal Text="Start Next Round" ></BlueButton>
 </div>
 
+@code{
 
-@code {
+    void ShowModal()
+    {
+        var options = new ModalOptions()
+        {
+            Class = "blazored-modal-opponent"
+        };
+
+        modal.Show<OpponentEntry>("Enter Opponents Name", options);
+    }
 
 }
 
 <style>
-    .main{
-        display: flex;
+    .blazored-modal-opponent{
         flex-direction: column;
-        align-items: center;
-        justify-content: space-around;
-        height: 100%;
-    }
-    button{
-        margin-bottom: 20px;
-    }
-    p{
-        margin-bottom: 20px;
+        z-index: 102;
+        background-color: #fff;
+        border-radius: 5px;
+        padding: 10px;
     }
 </style>
